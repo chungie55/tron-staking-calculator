@@ -7,13 +7,13 @@ export default function Home() {
   const [trxPrice, setTrxPrice] = useState<string>("");
   const [trxToStake, setTrxToStake] = useState<string>("");
 
-  // TRON network constants
-  const ENERGY_PER_TRC20_TRANSFER = 130000; // Energy required for TRC20 transfer
-  const BANDWIDTH_PER_TRANSFER = 345; // Bandwidth required for TRC20 transfer
-  const ENERGY_PRICE_PER_UNIT = 100; // sun per energy unit (0.00000042 TRX)
-  const BANDWIDTH_PRICE_PER_UNIT = 1000; // sun per bandwidth unit (0.000001 TRX)
-  const ENERGY_PER_TRX_STAKED = 10; // Energy generated per TRX staked per day
-  const PROFESSIONAL_FEE = 10000; // Professional fee (USD)
+  // TRON network constants from environment variables with fallbacks
+  const ENERGY_PER_TRC20_TRANSFER = parseInt(process.env.NEXT_PUBLIC_ENERGY_PER_TRC20_TRANSFER || '130000');
+  const BANDWIDTH_PER_TRANSFER = parseInt(process.env.NEXT_PUBLIC_BANDWIDTH_PER_TRANSFER || '345');
+  const ENERGY_PRICE_PER_UNIT = parseInt(process.env.NEXT_PUBLIC_ENERGY_PRICE_PER_UNIT || '100');
+  const BANDWIDTH_PRICE_PER_UNIT = parseInt(process.env.NEXT_PUBLIC_BANDWIDTH_PRICE_PER_UNIT || '1000');
+  const ENERGY_PER_TRX_STAKED = parseInt(process.env.NEXT_PUBLIC_ENERGY_PER_TRX_STAKED || '10');
+  const PROFESSIONAL_FEE = parseInt(process.env.NEXT_PUBLIC_PROFESSIONAL_FEE || '10000');
 
   const calculateCosts = () => {
     const volume = parseFloat(dailyVolume) || 0;
