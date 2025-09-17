@@ -3,22 +3,44 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [dailyVolume, setDailyVolume] = useState<string>("");
-  const [trxPrice, setTrxPrice] = useState<string>("");
+  const [dailyVolume, setDailyVolume] = useState<string>("100");
+  const [trxPrice, setTrxPrice] = useState<string>("0.35");
   const [trxToStake, setTrxToStake] = useState<string>("");
+  const [showConfig, setShowConfig] = useState<boolean>(false);
 
-  // TRON network constants from environment variables with fallbacks
-  const ENERGY_PER_TRC20_TRANSFER = parseInt(process.env.NEXT_PUBLIC_ENERGY_PER_TRC20_TRANSFER || '130000');
-  const BANDWIDTH_PER_TRANSFER = parseInt(process.env.NEXT_PUBLIC_BANDWIDTH_PER_TRANSFER || '345');
-  const ENERGY_PRICE_PER_UNIT = parseInt(process.env.NEXT_PUBLIC_ENERGY_PRICE_PER_UNIT || '100');
-  const BANDWIDTH_PRICE_PER_UNIT = parseInt(process.env.NEXT_PUBLIC_BANDWIDTH_PRICE_PER_UNIT || '1000');
-  const ENERGY_PER_TRX_STAKED = parseInt(process.env.NEXT_PUBLIC_ENERGY_PER_TRX_STAKED || '10');
-  const PROFESSIONAL_FEE = parseInt(process.env.NEXT_PUBLIC_PROFESSIONAL_FEE || '10000');
+  // Configurable TRON network constants
+  const [energyPerTrc20Transfer, setEnergyPerTrc20Transfer] = useState<string>("130000");
+  const [bandwidthPerTransfer, setBandwidthPerTransfer] = useState<string>("345");
+  const [energyPricePerUnit, setEnergyPricePerUnit] = useState<string>("100");
+  const [bandwidthPricePerUnit, setBandwidthPricePerUnit] = useState<string>("1000");
+  const [energyPerTrxStaked, setEnergyPerTrxStaked] = useState<string>("10");
+  const [professionalFee, setProfessionalFee] = useState<string>("10000");
+
+  // Utility function to format numbers with 2 decimals and comma separators
+  const formatCurrency = (num: number): string => {
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // Utility function to format large numbers with commas
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US');
+  };
 
   const calculateCosts = () => {
     const volume = parseFloat(dailyVolume) || 0;
     const price = parseFloat(trxPrice) || 0;
     const userTrxToStake = parseFloat(trxToStake) || 0;
+
+    // Parse configurable constants
+    const ENERGY_PER_TRC20_TRANSFER = parseInt(energyPerTrc20Transfer) || 130000;
+    const BANDWIDTH_PER_TRANSFER = parseInt(bandwidthPerTransfer) || 345;
+    const ENERGY_PRICE_PER_UNIT = parseInt(energyPricePerUnit) || 100;
+    const BANDWIDTH_PRICE_PER_UNIT = parseInt(bandwidthPricePerUnit) || 1000;
+    const ENERGY_PER_TRX_STAKED = parseInt(energyPerTrxStaked) || 10;
+    const PROFESSIONAL_FEE = parseInt(professionalFee) || 10000;
 
     if (volume <= 0 || price <= 0) {
       return null;
@@ -107,6 +129,115 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Configuration Section */}
+        <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+          <button
+            onClick={() => setShowConfig(!showConfig)}
+            className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors"
+          >
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Network Configuration
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Adjust TRON network parameters and costs
+              </p>
+            </div>
+            <svg
+              className={`w-5 h-5 text-gray-500 transition-transform ${showConfig ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {showConfig && (
+            <div className="px-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <label htmlFor="energyPerTrc20Transfer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Energy per TRC20 Transfer
+                  </label>
+                  <input
+                    id="energyPerTrc20Transfer"
+                    type="number"
+                    value={energyPerTrc20Transfer}
+                    onChange={(e) => setEnergyPerTrc20Transfer(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bandwidthPerTransfer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bandwidth per Transfer
+                  </label>
+                  <input
+                    id="bandwidthPerTransfer"
+                    type="number"
+                    value={bandwidthPerTransfer}
+                    onChange={(e) => setBandwidthPerTransfer(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="energyPricePerUnit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Energy Price per Unit (Sun)
+                  </label>
+                  <input
+                    id="energyPricePerUnit"
+                    type="number"
+                    value={energyPricePerUnit}
+                    onChange={(e) => setEnergyPricePerUnit(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="bandwidthPricePerUnit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bandwidth Price per Unit (Sun)
+                  </label>
+                  <input
+                    id="bandwidthPricePerUnit"
+                    type="number"
+                    value={bandwidthPricePerUnit}
+                    onChange={(e) => setBandwidthPricePerUnit(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="energyPerTrxStaked" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Energy per TRX Staked
+                  </label>
+                  <input
+                    id="energyPerTrxStaked"
+                    type="number"
+                    value={energyPerTrxStaked}
+                    onChange={(e) => setEnergyPerTrxStaked(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="professionalFee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Professional Service Fee (USD)
+                  </label>
+                  <input
+                    id="professionalFee"
+                    type="number"
+                    value={professionalFee}
+                    onChange={(e) => setProfessionalFee(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Form */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -131,7 +262,7 @@ export default function Home() {
 
               <div>
                 <label htmlFor="trxPrice" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Current TRX Price (USD)
+                  Current TRX Price
                 </label>
                 <input
                   id="trxPrice"
@@ -139,7 +270,7 @@ export default function Home() {
                   step="0.01"
                   value={trxPrice}
                   onChange={(e) => setTrxPrice(e.target.value)}
-                  placeholder="Enter TRX price in USD"
+                  placeholder="Enter TRX price"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
@@ -177,26 +308,36 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
                     Resource Requirements
                   </h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Total Energy Required:</span>
-                      <span className="font-mono font-semibold">{results.totalEnergyRequired.toLocaleString()} units</span>
+                  <div className="space-y-4 text-sm">
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Energy</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Total Energy Required:</span>
+                          <span className="font-mono font-semibold">{results.totalEnergyRequired.toLocaleString()} units</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Energy from Staking:</span>
+                          <span className="font-mono font-semibold text-green-600 dark:text-green-400">
+                            {results.energyGeneratedFromStaking.toLocaleString()} units
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Remaining Energy to Burn:</span>
+                          <span className="font-mono font-semibold text-red-600 dark:text-red-400">
+                            {results.remainingEnergyToBurn.toLocaleString()} units
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Energy from Staking:</span>
-                      <span className="font-mono font-semibold text-green-600 dark:text-green-400">
-                        {results.energyGeneratedFromStaking.toLocaleString()} units
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Remaining Energy to Burn:</span>
-                      <span className="font-mono font-semibold text-red-600 dark:text-red-400">
-                        {results.remainingEnergyToBurn.toLocaleString()} units
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-t pt-2">
-                      <span className="text-gray-600 dark:text-gray-300">Bandwidth Required:</span>
-                      <span className="font-mono font-semibold">{results.totalBandwidthRequired.toLocaleString()} units</span>
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Bandwidth</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Bandwidth Required:</span>
+                          <span className="font-mono font-semibold">{results.totalBandwidthRequired.toLocaleString()} units</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -209,22 +350,22 @@ export default function Home() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Remaining Energy Cost:</span>
-                      <span className="font-mono font-semibold">{results.remainingEnergyCostTRX.toFixed(6)} TRX</span>
+                      <span className="font-mono font-semibold">{results.remainingEnergyCostTRX.toLocaleString()} TRX</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Bandwidth Cost:</span>
-                      <span className="font-mono font-semibold">{results.bandwidthCostTRX.toFixed(6)} TRX</span>
+                      <span className="font-mono font-semibold">{results.bandwidthCostTRX.toLocaleString()} TRX</span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
                       <span className="text-gray-600 dark:text-gray-300 font-semibold">Daily Burn Cost:</span>
                       <span className="font-mono font-bold text-red-600 dark:text-red-400">
-                        ${(results.remainingEnergyCostUSD + results.bandwidthCostUSD).toFixed(2)}
+                        ${formatCurrency(results.remainingEnergyCostUSD + results.bandwidthCostUSD)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300 font-semibold">Monthly Burn Cost:</span>
                       <span className="font-mono font-bold text-red-600 dark:text-red-400">
-                        ${(results.monthlyRemainingEnergyCostUSD + results.monthlyBandwidthCostUSD).toFixed(2)}
+                        ${formatCurrency(results.monthlyRemainingEnergyCostUSD + results.monthlyBandwidthCostUSD)}
                       </span>
                     </div>
                   </div>
@@ -238,16 +379,16 @@ export default function Home() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">TRX to Stake:</span>
-                      <span className="font-mono font-semibold">{results.actualTrxToStake.toFixed(2)} TRX</span>
+                      <span className="font-mono font-semibold">{results.actualTrxToStake.toLocaleString()} TRX</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Max Required TRX:</span>
-                      <span className="font-mono font-semibold">{results.maxTrxToStakeForEnergy.toFixed(2)} TRX</span>
+                      <span className="font-mono font-semibold">{results.maxTrxToStakeForEnergy.toLocaleString()} TRX</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">One-time Staking Cost (USD):</span>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="text-gray-600 dark:text-gray-300 font-semibold">One-time Staking Cost:</span>
                       <span className="font-mono font-bold text-red-600 dark:text-red-400">
-                        ${results.stakingCostUSD.toFixed(2)}
+                        ${formatCurrency(results.stakingCostUSD)}
                       </span>
                     </div>
                   </div>
@@ -264,11 +405,11 @@ export default function Home() {
                       <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-300">Pure Burn Strategy:</span>
-                          <span className="font-mono font-bold">${results.totalBurnCostUSD.toFixed(2)}</span>
+                          <span className="font-mono font-bold">${formatCurrency(results.totalBurnCostUSD)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-300">With Staking Strategy:</span>
-                          <span className="font-mono font-bold">${results.totalCostWithStakingUSD.toFixed(2)}</span>
+                          <span className="font-mono font-bold">${formatCurrency(results.totalCostWithStakingUSD)}</span>
                         </div>
                       </div>
                     </div>
@@ -278,11 +419,11 @@ export default function Home() {
                       <div className="space-y-1 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-300">Pure Burn Strategy:</span>
-                          <span className="font-mono font-bold">${results.monthlyBurnCostUSD.toFixed(2)}</span>
+                          <span className="font-mono font-bold">${formatCurrency(results.monthlyBurnCostUSD)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-300">With Staking Strategy:</span>
-                          <span className="font-mono font-bold">${results.monthlyTotalCostWithStakingUSD.toFixed(2)}</span>
+                          <span className="font-mono font-bold">${formatCurrency(results.monthlyTotalCostWithStakingUSD)}</span>
                         </div>
                       </div>
                     </div>
@@ -291,7 +432,13 @@ export default function Home() {
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-300 font-semibold">Monthly Savings:</span>
                         <span className="font-mono font-bold text-green-600 dark:text-green-400">
-                          ${results.monthlySavings.toFixed(2)}
+                          ${formatCurrency(results.monthlySavings)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between mt-2">
+                        <span className="text-gray-600 dark:text-gray-300 font-semibold">Yearly Savings:</span>
+                        <span className="font-mono font-bold text-green-600 dark:text-green-400">
+                          ${formatCurrency(results.monthlySavings * 12)}
                         </span>
                       </div>
                     </div>
@@ -306,12 +453,12 @@ export default function Home() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Professional Service Fee:</span>
-                      <span className="font-mono font-semibold">${PROFESSIONAL_FEE.toFixed(2)}</span>
+                      <span className="font-mono font-semibold">${formatCurrency(parseInt(professionalFee) || 10000)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Monthly Savings:</span>
                       <span className="font-mono font-semibold text-green-600 dark:text-green-400">
-                        ${results.monthlySavings.toFixed(2)}
+                        ${formatCurrency(results.monthlySavings)}
                       </span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
@@ -368,7 +515,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">TRC20 Transfer Cost</h3>
-              <p>Each TRC20 transfer consumes {ENERGY_PER_TRC20_TRANSFER} energy units and {BANDWIDTH_PER_TRANSFER} bandwidth units on the TRON network.</p>
+              <p>Each TRC20 transfer consumes {energyPerTrc20Transfer} energy units and {bandwidthPerTransfer} bandwidth units on the TRON network.</p>
             </div>
           </div>
         </div>
