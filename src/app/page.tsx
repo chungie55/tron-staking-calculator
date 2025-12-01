@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [dailyVolume, setDailyVolume] = useState<string>("100");
-  const [trxPrice, setTrxPrice] = useState<string>("0.35");
+  const [trxPrice, setTrxPrice] = useState<string>("0.36");
   const [trxToStake, setTrxToStake] = useState<string>("");
   const [showConfig, setShowConfig] = useState<boolean>(false);
 
@@ -14,7 +14,7 @@ export default function Home() {
   const [energyPricePerUnit, setEnergyPricePerUnit] = useState<string>("100");
   const [bandwidthPricePerUnit, setBandwidthPricePerUnit] = useState<string>("1000");
   const [energyPerTrxStaked, setEnergyPerTrxStaked] = useState<string>("10");
-  const [professionalFee, setProfessionalFee] = useState<string>("10000");
+  const [professionalFee, setProfessionalFee] = useState<string>("15000");
 
   // Utility function to format numbers with 2 decimals and comma separators
   const formatCurrency = (num: number): string => {
@@ -40,7 +40,7 @@ export default function Home() {
     const ENERGY_PRICE_PER_UNIT = parseInt(energyPricePerUnit) || 100;
     const BANDWIDTH_PRICE_PER_UNIT = parseInt(bandwidthPricePerUnit) || 1000;
     const ENERGY_PER_TRX_STAKED = parseInt(energyPerTrxStaked) || 10;
-    const PROFESSIONAL_FEE = parseInt(professionalFee) || 10000;
+    const PROFESSIONAL_FEE = parseInt(professionalFee) || 15000;
 
     if (volume <= 0 || price <= 0) {
       return null;
